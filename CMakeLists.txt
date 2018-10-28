@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(execlogger-proto)
+project(buildtrace-proto)
 
 add_executable(execlogger
     execlogger_win32.c)
