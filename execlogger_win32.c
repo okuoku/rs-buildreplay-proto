@@ -144,9 +144,13 @@ logfile_put_blob(uint32_t tag, char* data, size_t len){
         data[len] = 0;
         fprintf(stderr,"%s",data);
     }
-    (void)fwrite(&tag, sizeof(uint32_t), 1, theLogfile);
-    (void)fwrite(&datalen, sizeof(uint64_t), 1, theLogfile);
-    (void)fwrite(data, len, 1, theLogfile);
+
+    if(theLogfile){
+        (void)fwrite(&tag, sizeof(uint32_t), 1, theLogfile);
+        (void)fwrite(&datalen, sizeof(uint64_t), 1, theLogfile);
+        (void)fwrite(data, len, 1, theLogfile);
+    }
+
     ReleaseSemaphore(sem_logfile, 1, NULL);
 }
 
@@ -171,6 +175,8 @@ logfile_open(void){
     char logpath[MAX_PARAMLEN];
     LARGE_INTEGER ts;
     int r;
+
+    sem_logfile = CreateSemaphoreA(NULL, 1, 1, NULL);
 
     curdir_len = GetCurrentDirectoryW(4096, curdir);
     if(!curdir_len){
@@ -200,7 +206,6 @@ logfile_open(void){
     if(!theLogfile){
         return 0xdeadbeef;
     }
-    sem_logfile = CreateSemaphoreA(NULL, 1, 1, NULL);
 
     logfile_put_blob(TAG_IDNP, prev_ident, strlen(prev_ident));
     logfile_put_blob(TAG_IDNT, my_ident, strlen(my_ident));
@@ -635,8 +640,7 @@ main(int ac, char** av){
     ret = 0;
     r = logfile_open();
     if(r){
-        fprintf(stderr, "Logfile open: Win32 err %d\n",r);
-        return r;
+        fprintf(stderr, "WARNING: Logfile open Win32 err %d\n",r);
     }
 
     args_record();
