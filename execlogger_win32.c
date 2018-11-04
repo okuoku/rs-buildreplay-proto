@@ -544,6 +544,7 @@ static int /* Win32 error */
 launch(HANDLE* prochandle){
     HANDLE h1[2];
     HANDLE h2[2];
+    HANDLE h3[2];
 
     int r;
 
@@ -553,6 +554,7 @@ launch(HANDLE* prochandle){
 
     newpipe(h1);
     newpipe(h2);
+    newpipe(h3);
 
     // https://docs.microsoft.com/en-us/windows/desktop/api/winbase/nf-winbase-getstartupinfoa
     GetStartupInfoW(&su);
@@ -563,7 +565,7 @@ launch(HANDLE* prochandle){
     newproc.cb = sizeof(STARTUPINFOW);
     newproc.dwFlags = STARTF_USESTDHANDLES;
 
-    newproc.hStdInput = INVALID_HANDLE_VALUE;
+    newproc.hStdInput = h3[0]; // Just blocks
     newproc.hStdOutput = h1[1];
     newproc.hStdError = h2[1];
 
