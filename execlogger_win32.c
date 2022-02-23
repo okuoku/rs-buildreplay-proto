@@ -413,7 +413,6 @@ args_record(void){
 
 static int /* Win32 error */
 args_gen(void){
-    FILE* check;
     wchar_t* cmdline;
     wchar_t modname[4096];
     wchar_t myname[4096];
@@ -424,6 +423,7 @@ args_gen(void){
     wchar_t* cur;
     wchar_t* origargs;
     const buflen = MAX_ARGSIZE;
+    size_t namelen;
     int r;
 
     /* Calc replacement executable name */
@@ -431,20 +431,18 @@ args_gen(void){
     if(r == 0){
         return GetLastError();
     }
-    /* 1st try: rs-exectrace/ORIG.exe */
+    /* try: ORIG.traced.exe */
     _wsplitpath(modname, exec_drive, exec_dir, exec_fname, exec_ext);
-    wcscat(exec_dir, L"rs-exectrace");
-    _wmakepath(myname, exec_drive, exec_dir, exec_fname, exec_ext);
-    fwprintf(stderr, L"Trying %s\n",myname);
-    check = _wfopen(myname, L"rb");
-    if(check){
-        fclose(check);
-        fwprintf(stderr, L"OK %s\n",myname);
-    }else{
-        /* 2nd try: ORIG.traced.exe */
-        wcscpy(myname, modname);
-        wcscat(myname, L".traced.exe");
+    wcscpy(myname, modname);
+    namelen = wcslen(myname);
+    if((myname[namelen-4] == L'.') &&
+       (myname[namelen-3] == L'e') &&
+       (myname[namelen-2] == L'x') &&
+       (myname[namelen-1] == L'e')){
+        namelen-=4;
+        myname[namelen] = 0;
     }
+    wcscat(myname, L".traced.exe");
 
     newargs = malloc(MAX_ARGSIZE * sizeof(wchar_t));
     wcscpy(newargs, myname);
