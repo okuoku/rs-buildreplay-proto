@@ -155,6 +155,14 @@ logfile_put_blob(uint32_t tag, char* data, size_t len){
 }
 
 static void
+logfile_put_u32(uint32_t tag, uint32_t v){
+    char val[20];
+    int n;
+    n = snprintf(val, 20, "%d", v);
+    logfile_put_blob(tag, val, n);
+}
+
+static void
 logfile_put_utf16(uint32_t tag, wchar_t* data, size_t count){
     const size_t bufsiz = count * sizeof(wchar_t) * 2;
     void* buf;
@@ -655,6 +663,7 @@ main(int ac, char** av){
     }
 
     args_term();
+    logfile_put_u32(TAG_PRES, ret);
     logfile_close();
     return ret;
 }

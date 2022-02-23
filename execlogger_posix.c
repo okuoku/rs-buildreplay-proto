@@ -138,6 +138,14 @@ logfile_put_blob(uint32_t tag, char* data, size_t len){
     sem_post(&sem_logfile);
 }
 
+static void
+logfile_put_u32(uint32_t tag, uint32_t v){
+    char val[20];
+    int n;
+    n = snprintf(val, 20, "%d", v);
+    logfile_put_blob(tag, val, n);
+}
+
 static int /* Win32 error */
 logfile_open(void){
     char pth[MAX_PARAMLEN];
@@ -445,6 +453,7 @@ main(int ac, char** av){
     }
 
     args_term();
+    logfile_put_u32(TAG_PRES, ret);
     logfile_close();
     return ret;
 }
