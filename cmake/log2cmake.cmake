@@ -25,6 +25,8 @@ foreach(f ${logs})
     if(NOT dat STREQUAL dat2)
         message(FATAL_ERROR "Invalid character in: ${f}")
     endif()
+    # Escape end-of-line backslash
+    string(REPLACE "\\\n" "${_ESC}\n" dat "${dat}") 
     # Split file into list-of-lines
     string(REGEX REPLACE "\n" ";" lines "${dat}")
     set(argfs)
@@ -130,6 +132,7 @@ foreach(id ${ids})
             # Escape string
             string(REPLACE "\\" "\\\\" l ${l})
             string(REPLACE "\"" "\\\"" l ${l})
+            string(REPLACE "${_ESC}" "\\\\" l ${l})
             file(APPEND ${OUT} "\t\"${l}\"\n")
         endforeach()
         file(APPEND ${OUT} ")\n")
